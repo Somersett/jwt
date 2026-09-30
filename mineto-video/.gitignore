@@ -1,0 +1,6 @@
+node_modules/
+out/*
+!out/mineto-promo-1920x1080.mp4
+!out/poster.png
+!out/storyboard.png
+.DS_Store

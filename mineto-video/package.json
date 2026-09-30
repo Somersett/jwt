@@ -1,0 +1,28 @@
+{
+  "name": "mineto-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mineto \u2014 promotional motion graphics built with Remotion",
+  "scripts": {
+    "dev": "remotion studio src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "render": "remotion render src/index.ts MinetoPromo out/mineto-promo-1920x1080.mp4",
+    "render:preview": "remotion render src/index.ts MinetoPromo out/preview-960x540.mp4 --scale=0.5 --crf=26",
+    "still": "remotion still src/index.ts MinetoPromo out/poster.png --frame=749",
+    "cues": "tsx scripts/print-cues.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.531",
+    "@remotion/fonts": "4.0.531",
+    "@remotion/layout-utils": "4.0.531",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.531"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "geist": "1.7.2",
+    "tsx": "4.20.3",
+    "typescript": "5.8.3"
+  }
+}
