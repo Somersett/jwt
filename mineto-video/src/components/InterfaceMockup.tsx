@@ -6,7 +6,7 @@ import {PRODUCT_GEO} from '../layout/geometry';
 import {textWidth} from '../layout/measure';
 import {clamp01, lerp, lerpRect, mixColor, progress, pulse, springAt} from '../motion/animate';
 import type {Rect} from '../motion/animate';
-import {DUR, EASE, SPRING, STAGGER} from '../motion/easing';
+import {DUR, EASE, SPRING} from '../motion/easing';
 import {PRODUCT_T} from '../motion/timeline';
 import {COLORS} from '../theme/colors';
 import {RADIUS, space} from '../theme/spacing';
@@ -153,8 +153,8 @@ const StatusPill: React.FC<{at: number}> = ({at}) => {
 const Row: React.FC<{index: number; frame: number}> = ({index, frame}) => {
 	const bucket = RESERVES[index];
 	const top = G.rowsTop + index * G.rowHeight;
-	const enter = progress(frame, PRODUCT_T.rowsIn + index * STAGGER.item, DUR.base, EASE.out);
-	const rule = progress(frame, PRODUCT_T.rowsIn + index * STAGGER.item - 4, DUR.move, EASE.out);
+	const enter = progress(frame, PRODUCT_T.rowsIn + index * PRODUCT_T.rowStagger, DUR.base, EASE.out);
+	const rule = progress(frame, PRODUCT_T.rowsIn + index * PRODUCT_T.rowStagger - 4, DUR.move, EASE.out);
 	const centerY = G.rowHeight / 2;
 	const textTop = centerY - capCenterFromTop(ROW_TEXT.fontSize, 1);
 	return (
@@ -198,7 +198,7 @@ const Row: React.FC<{index: number; frame: number}> = ({index, frame}) => {
 					<AnimatedMoney
 						keyframes={[
 							{at: 0, value: 0},
-							{at: PRODUCT_T.rowsIn + index * STAGGER.item, value: bucket.value},
+							{at: PRODUCT_T.rowsIn + index * PRODUCT_T.rowStagger, value: bucket.value},
 						]}
 						duration={DUR.slow}
 						roundTo={100}
@@ -213,7 +213,7 @@ const Row: React.FC<{index: number; frame: number}> = ({index, frame}) => {
 					clipPath: `inset(0 0 0 ${(1 - enter) * 100}% round ${RADIUS.pill}px)`,
 				}}
 			>
-				<StatusPill at={PRODUCT_T.checks + index * STAGGER.item} />
+				<StatusPill at={PRODUCT_T.checks + index * PRODUCT_T.checkStagger} />
 			</div>
 		</div>
 	);

@@ -14,13 +14,14 @@ import {CONTENT} from '../theme/spacing';
 import {capCenterFromTop} from '../theme/typography';
 
 /**
- * 17.5–21 s · Three statements, then they fuse into MINETO.
+ * 27–32.5 s · Three statements, then they fuse into MINETO.
+ * Frames below are local to the scene.
  *
- * AUDIO  f4    soft whoosh per statement (4, 26, 48)
- *        f68   riser as the markers line up on the slit
- *        f86   soft click: the bar folds into the logo mark
- *        f76   reverse swell: the middle statement collapses into a hairline
- *        f90   transition hit: the wordmark opens out of the slit
+ * AUDIO  f6    soft whoosh per statement (6, 42, 78)
+ *        f118  riser as the markers line up on the slit
+ *        f124  reverse swell: the middle statement collapses into a hairline
+ *        f135  transition hit: the wordmark opens out of the slit (beat 9)
+ *        f136  soft click: the bar folds into the logo mark
  */
 
 const G = MANIFESTO_GEO;

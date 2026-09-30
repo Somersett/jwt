@@ -13,12 +13,13 @@ import {CONTENT, RADIUS, STAGE, STROKE, space} from '../theme/spacing';
 import {TYPE} from '../theme/typography';
 
 /**
- * 21–25 s · End card.
+ * 32.5–37.5 s · End card.
+ * Frames below are local to the scene.
  *
  * AUDIO  f0    transition hit: paper wipes up over the ink
  *        f24   soft whoosh under the tagline
- *        f68   soft click: CTA hover
- *        f96   final "click" as the mark closes; let the pad ring out
+ *        f84   soft click: CTA hover
+ *        f114  final "click" as the mark closes; let the pad ring out
  */
 
 const T = END_T;

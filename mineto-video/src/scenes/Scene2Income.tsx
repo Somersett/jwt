@@ -15,13 +15,14 @@ import {TYPE} from '../theme/typography';
 import {INTRO_HANDOFF, introUnderlineState} from './Scene1Intro';
 
 /**
- * 4–8 s · "Recibiste este mes: $6.000.000", then a line divides it.
+ * 5.5–12 s · "Recibiste este mes: $6.000.000", then a line divides it.
+ * Frames below are local to the scene.
  *
- * AUDIO  f0   whoosh: the split underline travels down
- *        f14  number tick run while the amount counts up (14 → 54)
- *        f60  transition hit on the beat: the dividing line drops
- *        f66  soft click as the bar breaks at the line
- *        f84  three soft ticks, one per category
+ * AUDIO  f4    whoosh: the split underline travels down
+ *        f14   number tick run while the amount counts up (14 → 54)
+ *        f75   transition hit on the beat: the dividing line drops
+ *        f81   soft click as the bar breaks at the line
+ *        f100  three soft ticks, one per category (100, 108, 116)
  */
 
 const G = INCOME_GEO;
@@ -173,7 +174,7 @@ export const Scene2Income: React.FC = () => {
 			))}
 
 			{RESERVES.map((bucket, i) => {
-				const enter = progress(frame, T.categoriesIn + i * STAGGER.item, DUR.base, EASE.out);
+				const enter = progress(frame, T.categoriesIn + i * T.categoryStagger, DUR.base, EASE.out);
 				const exit = out(3 + i);
 				const top = G.categoriesTop + i * G.categoryStep;
 				return (

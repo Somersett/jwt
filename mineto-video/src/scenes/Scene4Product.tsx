@@ -11,16 +11,17 @@ import {COLORS} from '../theme/colors';
 import {TYPE} from '../theme/typography';
 
 /**
- * 12.5–17.5 s · The available amount becomes the product.
+ * 19.5–27 s · The available amount becomes the product.
+ * Frames below are local to the scene.
  *
  * AUDIO  f0    whoosh: the amount flies into the interface
  *        f12   number tick as "$4.803.400" rolls into "$4,8M"
  *        f18   soft riser: the card grows out of the figure
- *        f66   three soft clicks, one per "Separado" check (66, 72, 78)
- *        f84   soft click: the payment nudge slides in
- *        f88   whoosh (light) under the headline
- *        f108  soft click: cursor press on the bar
- *        f135  transition hit: the ink wipe (handled in MinetoPromo)
+ *        f90   three soft clicks, one per "Separado" check (90, 98, 106)
+ *        f118  soft click: the payment nudge slides in
+ *        f130  whoosh (light) under the headline
+ *        f174  soft click: cursor press on the bar
+ *        f210  transition hit: the ink wipe (handled in MinetoPromo)
  */
 
 const G = PRODUCT_GEO;

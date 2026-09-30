@@ -1,11 +1,11 @@
 # MINETO — video promocional (motion graphics)
 
-Pieza de 25 s en **Remotion + React + TypeScript**, construida solo con texto, formas, SVG y CSS. No usa assets de pago y las fuentes están incluidas en el repositorio.
+Pieza de 37,5 s en **Remotion + React + TypeScript**, construida solo con texto, formas, SVG y CSS. No usa assets de pago y las fuentes están incluidas en el repositorio.
 
 | | |
 |---|---|
 | Composición | `MinetoPromo` (`src/MinetoPromo.tsx`) |
-| Duración | 750 frames = **25,0 s** |
+| Duración | 1125 frames = **37,5 s** |
 | Resolución | **1920 × 1080**, 16:9 |
 | FPS | 30 |
 | Salida | H.264, yuv420p, BT.709, CRF 16 |
@@ -28,19 +28,20 @@ Pieza de 25 s en **Remotion + React + TypeScript**, construida solo con texto, f
 - **Nada aparece con fade.** El texto entra por máscaras (`Mask` / `TextReveal`), las superficies crecen desde el elemento que las origina y los cambios de color se hacen con un borde duro que se desplaza (`ReserveBar.covers`), nunca interpolando colores, porque eso pasa por tonos turbios.
 - **Matched cuts.** El estado final de un elemento compartido en una escena es exactamente el estado inicial en la siguiente, porque ambas leen la misma geometría.
 - **Ritmo.** El montaje está cortado a **120 BPM** (1 beat = 15 frames). Todas las escenas empiezan en un beat y los seis golpes de transición caen en beat exacto.
+- **Tiempo de lectura.** Las animaciones son rápidas, pero cada escena termina con una pausa en la que todo queda quieto y completo en pantalla (~1,5–2,5 s) antes de salir. Las entradas secuenciales van espaciadas: una tarjeta por segundo y ~1,2 s por frase.
 
 ## Timeline
 
 | # | Escena | Frames | Segundos | Qué pasa |
 |---|---|---|---|---|
-| 1 | Intro | 0–120 | 0–4 | MINETO entra letra a letra y sube a cabecera. "ganas" aparece sola, viaja a su sitio y la frase se completa en onda. Su subrayado en tinta se descubre partido en 4 buckets. |
-| 2 | Ingreso | 120–240 | 4–8 | La barra partida viaja, se cierra y se cubre de tinta mientras **$6.000.000** cuenta. Cae una línea vertical, la tinta se retira desde el corte y aparecen las categorías. |
-| 3 | Distribución | 240–375 | 8–12,5 | La cifra se encoge al nivel 01. Conectores ortogonales bajan de cada tramo de la barra a su tarjeta y el disponible rueda como odómetro: 6.000.000 → 5.303.400 → 4.923.400 → **4.803.400**. |
-| 4 | Producto | 375–525 | 12,5–17,5 | La cifra viaja a la UI y "$4.803.400" se convierte en "$4,8M". La tarjeta crece desde la cifra, las reservas pasan a "Separado", entran el aviso ámbar y el titular, y el cursor muestra un tooltip. Barrido a tinta. |
-| 5 | Manifiesto | 525–630 | 17,5–21 | Tres frases con su marcador de color. Las externas se retiran, la central colapsa en una rendija, los marcadores forman una barra y se pliegan en el símbolo mientras MINETO se abre. |
-| 6 | Cierre | 630–750 | 21–25 | El papel sube sobre la tinta y el logo se recolorea en el borde exacto del barrido. Luego tagline, CTA con hover, mineto.tech y el "clic" final del símbolo. |
+| 1 | Intro | 0–165 | 0–5,5 | MINETO entra letra a letra y sube a cabecera. "ganas" aparece sola, viaja a su sitio y la frase se completa en onda. Su subrayado en tinta se descubre partido en 4 buckets. |
+| 2 | Ingreso | 165–360 | 5,5–12 | La barra partida viaja, se cierra y se cubre de tinta mientras **$6.000.000** cuenta. Cae una línea vertical, la tinta se retira desde el corte y aparecen las categorías. |
+| 3 | Distribución | 360–585 | 12–19,5 | La cifra se encoge al nivel 01. Conectores ortogonales bajan de cada tramo de la barra a su tarjeta y el disponible rueda como odómetro: 6.000.000 → 5.303.400 → 4.923.400 → **4.803.400**. |
+| 4 | Producto | 585–810 | 19,5–27 | La cifra viaja a la UI y "$4.803.400" se convierte en "$4,8M". La tarjeta crece desde la cifra, las reservas pasan a "Separado", entran el aviso ámbar y el titular, y el cursor muestra un tooltip. Barrido a tinta. |
+| 5 | Manifiesto | 810–975 | 27–32,5 | Tres frases con su marcador de color. Las externas se retiran, la central colapsa en una rendija, los marcadores forman una barra y se pliegan en el símbolo mientras MINETO se abre. |
+| 6 | Cierre | 975–1125 | 32,5–37,5 | El papel sube sobre la tinta y el logo se recolorea en el borde exacto del barrido. Luego tagline, CTA con hover, mineto.tech y el "clic" final del símbolo. |
 
-Los tiempos internos de cada escena están en `src/motion/timeline.ts` (`INTRO_T`, `INCOME_T`, …).
+Los tiempos internos de cada escena están en `src/motion/timeline.ts` (`INTRO_T`, `INCOME_T`, …). Para dar más o menos tiempo de lectura, alarga la escena en `LENGTH` y mueve su `exit` (o `wipe`) en la misma cantidad de frames.
 
 ## Audio (opcional)
 
@@ -50,7 +51,7 @@ El video funciona sin sonido. `src/audio/cues.ts` deriva cada cue (whoosh, click
 npm run cues   # imprime: frame · segundos · beat · tipo · descripción
 ```
 
-Golpes principales: f90, f180, f345, f510, f615, f630. Todos caen en beat.
+Golpes principales: f120, f240, f495, f795, f945, f975. Todos caen en beat.
 
 ## Estructura
 

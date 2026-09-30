@@ -57,7 +57,7 @@ export const CUES: Cue[] = [
 
 	{frame: at('product', PRODUCT_T.move), kind: 'whoosh', note: 'Amount flies into the interface'},
 	{frame: at('product', PRODUCT_T.suffixSwap), kind: 'tick', note: '$4.803.400 rolls into $4,8M'},
-	{frame: at('product', PRODUCT_T.checks), kind: 'click', note: 'Three "Separado" checks (every 6 frames)'},
+	{frame: at('product', PRODUCT_T.checks), kind: 'click', note: `Three "Separado" checks (every ${PRODUCT_T.checkStagger} frames)`},
 	{frame: at('product', PRODUCT_T.alertIn), kind: 'click', note: 'Payment nudge slides in'},
 	{frame: at('product', PRODUCT_T.headlineIn), kind: 'whoosh', note: 'Headline (light)'},
 	{frame: at('product', PRODUCT_T.tooltipIn - 6), kind: 'click', note: 'Cursor presses the bar'},

@@ -27,14 +27,15 @@ import {TYPE, capCenterFromTop} from '../theme/typography';
 import {incomeBarState} from './Scene2Income';
 
 /**
- * 8–12.5 s · Income → reserves → what is left.
+ * 12–19.5 s · Income → reserves → what is left.
+ * Frames below are local to the scene.
  *
  * AUDIO  f0    whoosh: the amount lifts into tier 01
- *        f45   soft click + number tick (seguridad social lands)
- *        f60   soft click + number tick (impuestos)
- *        f75   soft click + number tick (retenciones)
- *        f55   number tick (odometer) each time the available amount rolls down (55, 70, 85)
- *        f105  transition hit: the available amount resolves in mint
+ *        f45   soft click (seguridad social lands)
+ *        f75   soft click (impuestos)
+ *        f105  soft click (retenciones)
+ *        f55   number tick (odometer) each time the available amount rolls down (55, 85, 115)
+ *        f135  transition hit: the available amount resolves in mint (beat 9)
  */
 
 const G = DISTRIBUTION_GEO;

@@ -13,13 +13,14 @@ import {CONTENT, STAGE} from '../theme/spacing';
 import {TYPE} from '../theme/typography';
 
 /**
- * 0–4 s · "Lo que ganas no es lo mismo que lo que puedes gastar."
+ * 0–5.5 s · "Lo que ganas no es lo mismo que lo que puedes gastar."
+ * Frames below are local to the scene.
  *
- * AUDIO  f3   soft riser under the wordmark
- *        f30  whoosh as MINETO lifts into the masthead (beat 2)
- *        f52  soft click as "ganas" snaps into its slot
- *        f66  soft tick run as the sentence ripples out
- *        f90  transition hit: the underline splits into four (beat 6)
+ * AUDIO  f3    soft riser under the wordmark
+ *        f45   whoosh as MINETO lifts into the masthead (beat 3)
+ *        f72   soft click as "ganas" snaps into its slot
+ *        f86   soft tick run as the sentence ripples out
+ *        f120  transition hit: the underline splits into four (beat 8)
  */
 
 /**
@@ -131,7 +132,7 @@ export const Scene1Intro: React.FC = () => {
 					const rank = rippleRank.get(`${lineIndex}-${wordIndex}`) ?? 0;
 					const enter = isKeyword
 						? keywordIn
-						: progress(frame, INTRO_T.sentenceIn + rank * STAGGER.word, DUR.base, EASE.out);
+						: progress(frame, INTRO_T.sentenceIn + rank * INTRO_T.rippleStagger, DUR.base, EASE.out);
 					const exit = progress(frame, INTRO_T.exit + exitOrder++ * 0.6, DUR.fast, EASE.in);
 					return (
 						<div

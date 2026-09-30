@@ -20,14 +20,18 @@ export const SCENE_ORDER = [
 
 export type SceneId = (typeof SCENE_ORDER)[number];
 
-/** Nominal length of each scene, until the next one starts. */
+/**
+ * Nominal length of each scene, until the next one starts. Every scene ends
+ * with a reading hold: once its last element lands, it stays complete on
+ * screen for roughly 1.5–2.5 s before anything leaves.
+ */
 const LENGTH: Record<SceneId, number> = {
-	intro: beats(8), // 0.0 – 4.0 s
-	income: beats(8), // 4.0 – 8.0 s
-	distribution: beats(9), // 8.0 – 12.5 s
-	product: beats(10), // 12.5 – 17.5 s
-	manifesto: beats(7), // 17.5 – 21.0 s
-	endCard: beats(8), // 21.0 – 25.0 s
+	intro: beats(11), // 0.0 – 5.5 s
+	income: beats(13), // 5.5 – 12.0 s
+	distribution: beats(15), // 12.0 – 19.5 s
+	product: beats(15), // 19.5 – 27.0 s
+	manifesto: beats(11), // 27.0 – 32.5 s
+	endCard: beats(10), // 32.5 – 37.5 s
 };
 
 /**
@@ -64,14 +68,15 @@ export const TOTAL_FRAMES = SCENE_ORDER.reduce((sum, id) => sum + LENGTH[id], 0)
 
 export const INTRO_T = {
 	wordmarkIn: 3,
-	toMasthead: 30, // beat 2
-	ganasIn: 40,
-	ganasToSlot: 52,
+	toMasthead: 45, // beat 3 — MINETO holds a full second first
+	ganasIn: 56,
+	ganasToSlot: 72,
 	/** The rest of the sentence ripples out from the keyword once it has landed. */
-	sentenceIn: 66,
-	underlineDraw: 74,
-	underlineSplit: 90, // beat 6
-	exit: 100,
+	sentenceIn: 86,
+	rippleStagger: 2,
+	underlineDraw: 96,
+	underlineSplit: 120, // beat 8
+	exit: 150, // beat 10 — complete sentence reads for ~1.7 s
 } as const;
 
 export const INCOME_T = {
@@ -86,12 +91,13 @@ export const INCOME_T = {
 	inkFill: 18,
 	inkFillDuration: 26,
 	annotationsIn: 42,
-	divider: 60, // beat 4
-	split: 66,
-	groupLabelsIn: 72,
-	categoriesIn: 84,
-	/** Everything but the amount and the bar clears before the cut (last exit ends ~f117). */
-	exit: 98,
+	divider: 75, // beat 5 — the full amount reads for ~0.7 s before the cut
+	split: 81,
+	groupLabelsIn: 88,
+	categoriesIn: 100,
+	categoryStagger: 8,
+	/** Reading hold, then everything but the amount and the bar clears before the cut. */
+	exit: 172,
 } as const;
 
 export const DISTRIBUTION_T = {
@@ -100,14 +106,14 @@ export const DISTRIBUTION_T = {
 	spine: 8,
 	tiers: [10, 22, 34],
 	availableIn: 34,
-	buckets: [45, 60, 75], // beats 3, 4, 5
+	buckets: [45, 75, 105], // beats 3, 5, 7 — one reserve per second
 	connectorDuration: 12,
 	cardDelay: 6,
 	countDelay: 10,
 	rollDelay: 10,
 	rollDuration: 14,
-	resolve: 105, // beat 7 of the scene, on the grid
-	exit: 116,
+	resolve: 135, // beat 9
+	exit: 200, // ~2.2 s reading hold on the resolved breakdown
 } as const;
 
 export const PRODUCT_T = {
@@ -122,31 +128,34 @@ export const PRODUCT_T = {
 	labelIn: 30,
 	subIn: 38,
 	barIn: 38,
-	rowsIn: 44,
-	checks: 66,
-	alertIn: 84,
-	headlineIn: 88,
-	cursorIn: 100,
-	tooltipIn: 114,
-	wipe: 135,
+	rowsIn: 50,
+	rowStagger: 8,
+	checks: 90, // beat 6
+	checkStagger: 8,
+	alertIn: 118,
+	headlineIn: 130,
+	cursorIn: 165,
+	tooltipIn: 180,
+	wipe: 210, // beat 14 — headline reads for ~2.7 s
 	wipeDuration: 15,
 } as const;
 
 export const MANIFESTO_T = {
-	lines: [4, 26, 48],
+	/** ~1.2 s per statement. */
+	lines: [6, 42, 78],
 	dimDuration: 10,
 	/** Markers line up on the slit as one segmented bar, then become the logo mark. */
-	markersAlign: 68,
+	markersAlign: 118,
 	markersAlignDuration: 16,
-	markersToMark: 86,
+	markersToMark: 136,
 	markersToMarkDuration: 14,
 	/** Statements 1 and 3 clear away through their masks. */
-	converge: 68,
+	converge: 120,
 	convergeDuration: 12,
 	/** Statement 2 collapses into a hairline. */
-	slit: 76,
+	slit: 124,
 	slitDuration: 12,
-	wordmarkOpen: 90, // lands on the beat
+	wordmarkOpen: 135, // beat 9; the logo then holds on ink until the cut
 	wordmarkOpenDuration: 14,
 } as const;
 
@@ -155,8 +164,8 @@ export const END_T = {
 	wipeDuration: 22,
 	logoUp: 12,
 	taglineIn: 24,
-	ctaIn: 40,
-	urlIn: 48,
-	ctaHover: 68,
-	logoClose: 86,
+	ctaIn: 44,
+	urlIn: 54,
+	ctaHover: 84,
+	logoClose: 104, // then a ~0.8 s final hold
 } as const;
