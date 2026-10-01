@@ -64,81 +64,46 @@ const easedRun = (start: number, duration: number, steps: number, easing: Easing
 const every = (start: number, step: number, count: number) =>
 	Array.from({length: count}, (_, i) => start + i * step);
 
-const ganasLands = INTRO_T.ganasToSlot + DUR.base - 2;
-const countRun = easedRun(at('income', INCOME_T.count), INCOME_T.countDuration, 14);
+const countRun = easedRun(at('income', INCOME_T.count), INCOME_T.countDuration, 8);
 
+/**
+ * Deliberately sparse: only the big moves, the moments money lands, and the
+ * structural hits get a sound. Everything else is carried by the music.
+ */
 export const CUES: Cue[] = [
-	{frame: at('intro', 0), kind: 'swell', length: 40, gain: -4, note: 'Air under MINETO rising'},
-	{frame: at('intro', INTRO_T.toMasthead), kind: 'whoosh', length: 22, gain: -5, note: 'Wordmark lifts into the masthead'},
-	{frame: at('intro', ganasLands), kind: 'click', gain: -3, note: '"ganas" settles into the sentence'},
-	{frame: at('intro', INTRO_T.underlineSplit), kind: 'hit', gain: -5, note: 'Underline splits into four buckets'},
+	{frame: at('intro', INTRO_T.toMasthead), kind: 'whoosh', length: 22, gain: -9, note: 'Wordmark lifts into the masthead'},
 
-	{frame: at('income', INCOME_T.barTravel), kind: 'whoosh', length: 22, note: 'Split underline travels to the income bar'},
-	{frame: countRun[0], kind: 'tick', repeats: countRun.slice(1), note: 'Amount counts up to $6.000.000'},
-	{frame: at('income', INCOME_T.divider), kind: 'hit', note: 'Dividing line drops'},
-	{frame: at('income', INCOME_T.split), kind: 'click', gain: -2, note: 'Bar breaks at the line'},
-	{
-		frame: at('income', INCOME_T.categoriesIn),
-		kind: 'tick',
-		gain: 2,
-		repeats: every(at('income', INCOME_T.categoriesIn + INCOME_T.categoryStagger), INCOME_T.categoryStagger, 2),
-		note: 'Categories appear (three ticks)',
-	},
+	{frame: at('income', INCOME_T.barTravel), kind: 'whoosh', length: 22, gain: -2, note: 'Split underline travels to the income bar'},
+	{frame: countRun[0], kind: 'tick', gain: -3, repeats: countRun.slice(1), note: 'Amount counts up to $6.000.000'},
+	{frame: at('income', INCOME_T.divider), kind: 'hit', gain: -2, note: 'Dividing line drops'},
 
-	{frame: at('distribution', DISTRIBUTION_T.move), kind: 'whoosh', length: DISTRIBUTION_T.moveDuration, note: 'Amount lifts into tier 01'},
-	...DISTRIBUTION_T.buckets.flatMap((local, i): Cue[] => [
-		{frame: at('distribution', local + DISTRIBUTION_T.cardDelay), kind: 'click', note: `Reserve ${i + 1} lands`},
-		{
-			frame: at('distribution', local + DISTRIBUTION_T.rollDelay),
-			kind: 'tick',
-			gain: -3,
-			repeats: every(at('distribution', local + DISTRIBUTION_T.rollDelay + 2), 2, 3),
-			note: `Available amount rolls down (${i + 1}/3)`,
-		},
-	]),
-	{frame: at('distribution', DISTRIBUTION_T.resolve), kind: 'hit', note: 'Available amount resolves in mint'},
+	{frame: at('distribution', DISTRIBUTION_T.move), kind: 'whoosh', length: DISTRIBUTION_T.moveDuration, gain: -3, note: 'Amount lifts into tier 01'},
+	...DISTRIBUTION_T.buckets.map(
+		(local, i): Cue => ({frame: at('distribution', local + DISTRIBUTION_T.cardDelay), kind: 'click', note: `Reserve ${i + 1} lands`}),
+	),
+	{frame: at('distribution', DISTRIBUTION_T.resolve), kind: 'hit', gain: -2, note: 'Available amount resolves in mint'},
 
-	{frame: at('product', PRODUCT_T.move), kind: 'whoosh', length: PRODUCT_T.moveDuration, note: 'Amount flies into the interface'},
-	{
-		frame: at('product', PRODUCT_T.suffixSwap),
-		kind: 'tick',
-		repeats: every(at('product', PRODUCT_T.suffixSwap + 4), 4, 2),
-		note: '$4.803.400 rolls into $4,8M',
-	},
+	{frame: at('product', PRODUCT_T.move), kind: 'whoosh', length: PRODUCT_T.moveDuration, gain: -3, note: 'Amount flies into the interface'},
 	{
 		frame: at('product', PRODUCT_T.checks),
 		kind: 'click',
-		gain: -2,
+		gain: -3,
 		repeats: every(at('product', PRODUCT_T.checks + PRODUCT_T.checkStagger), PRODUCT_T.checkStagger, 2),
 		note: `Three "Separado" checks (every ${PRODUCT_T.checkStagger} frames)`,
 	},
-	{frame: at('product', PRODUCT_T.alertIn), kind: 'click', gain: -4, note: 'Payment nudge slides in'},
-	{frame: at('product', PRODUCT_T.headlineIn), kind: 'whoosh', length: 20, gain: -9, note: 'Headline (light)'},
-	{frame: at('product', PRODUCT_T.tooltipIn - 6), kind: 'click', gain: -3, note: 'Cursor presses the bar'},
-	{frame: at('product', PRODUCT_T.wipe), kind: 'whoosh', length: PRODUCT_T.wipeDuration, gain: 1, note: 'Ink wipe sweeps across'},
-	{frame: SCENES.manifesto.from, kind: 'hit', gain: -2, note: 'Ink lands: the manifesto begins'},
+	{frame: at('product', PRODUCT_T.wipe), kind: 'whoosh', length: PRODUCT_T.wipeDuration, note: 'Ink wipe sweeps across'},
 
-	...MANIFESTO_T.lines.map(
-		(local, i): Cue => ({frame: at('manifesto', local), kind: 'swell', length: 20, gain: -5, note: `Statement ${i + 1}`}),
-	),
 	{
 		frame: at('manifesto', MANIFESTO_T.markersAlign),
 		kind: 'riser',
 		length: MANIFESTO_T.wordmarkOpen - MANIFESTO_T.markersAlign,
+		gain: -7,
 		note: 'Markers line up on the slit',
 	},
-	{frame: at('manifesto', MANIFESTO_T.wordmarkOpen), kind: 'hit', note: 'Wordmark opens out of the slit'},
-	{
-		frame: at('manifesto', MANIFESTO_T.markersToMark + MANIFESTO_T.markersToMarkDuration),
-		kind: 'click',
-		gain: -4,
-		note: 'The bar folds into the logo mark',
-	},
+	{frame: at('manifesto', MANIFESTO_T.wordmarkOpen), kind: 'hit', gain: -3, note: 'Wordmark opens out of the slit'},
 
-	{frame: at('endCard', END_T.wipe), kind: 'whoosh', length: END_T.wipeDuration, gain: -3, note: 'Paper wipes up; logo recolours at the edge'},
-	{frame: at('endCard', END_T.taglineIn), kind: 'swell', length: 24, gain: -8, note: 'Tagline'},
-	{frame: at('endCard', END_T.ctaHover), kind: 'click', gain: -4, note: 'CTA hover'},
-	{frame: at('endCard', END_T.logoClose + DUR.fast + 2), kind: 'click', note: 'Mark closes: final click'},
+	{frame: at('endCard', END_T.wipe), kind: 'whoosh', length: END_T.wipeDuration, gain: -4, note: 'Paper wipes up; logo recolours at the edge'},
+	{frame: at('endCard', END_T.logoClose + DUR.fast + 2), kind: 'click', gain: -2, note: 'Mark closes: final click'},
 ];
 
 const formatCue = (cue: Cue) => {

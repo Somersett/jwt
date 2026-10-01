@@ -42,12 +42,12 @@ RNG = np.random.default_rng(20260930)
 # Each music layer is measured (gated integrated loudness, where it plays) and
 # scaled to its target, so the balance does not depend on guessed gains.
 STEM_LUFS = {
-    "pad": -21.0,
-    "felt": -23.5,
-    "bass": -25.0,
-    "kick": -27.5,
-    "shaker": -38.0,
-    "snap": -34.0,
+    "pad": -25.5,
+    "felt": -21.0,
+    "bass": -29.0,
+    "kick": -31.0,
+    "shaker": -42.0,
+    "snap": -35.0,
     "bell": -27.0,
 }
 # Each sound effect is scaled so its loudest 400 ms sits at this level before
@@ -60,21 +60,21 @@ SFX_MOMENTARY = {
     "click": -25.0,
     "tick": -28.0,
 }
-REVERB_RETURN_DB = -7.0
+REVERB_RETURN_DB = -12.0
 REVERB_SEND = {"pad": 0.25, "felt": 0.45, "bell": 0.6, "snap": 0.5, "shaker": 0.2, "sfx": 0.3, "kick": 0.04}
-TARGET_LUFS = -16.0  # soft; comfortable on web and social
+TARGET_LUFS = -17.0  # soft, with headroom so the limiter never has to work
 CEILING_DBFS = -1.0
 
 # ─────────────────────────── harmony ───────────────────────────
 # MIDI note numbers. Pad voicings move by step between chords; the felt piano
 # plays chord tones an octave above; the bass holds the root.
 CHORDS = {
-    "Dmaj9": {"pad": [50, 54, 57, 61, 64], "felt": [69, 74, 76, 78, 73], "root": 38},
-    "Bm9": {"pad": [47, 54, 57, 62, 73], "felt": [66, 71, 73, 74, 69], "root": 35},
-    "Gmaj9": {"pad": [55, 59, 62, 66, 69], "felt": [67, 71, 74, 78, 69], "root": 31},
-    "Em9": {"pad": [52, 55, 59, 62, 66], "felt": [64, 67, 71, 74, 66], "root": 40},
-    "A6sus": {"pad": [57, 59, 64, 66], "felt": [64, 69, 71, 76, 66], "root": 33},
-    "Asus4": {"pad": [57, 59, 62, 64], "felt": [64, 69, 74, 71, 76], "root": 33},
+    "Dmaj9": {"pad": [54, 57, 61, 64, 69], "felt": [69, 74, 76, 78, 73], "root": 38},
+    "Bm9": {"pad": [54, 57, 62, 66, 73], "felt": [66, 71, 73, 74, 69], "root": 35},
+    "Gmaj9": {"pad": [59, 62, 66, 69], "felt": [67, 71, 74, 78, 69], "root": 43},
+    "Em9": {"pad": [55, 59, 62, 66], "felt": [64, 67, 71, 74, 66], "root": 40},
+    "A6sus": {"pad": [59, 64, 66, 69], "felt": [64, 69, 71, 76, 66], "root": 45},
+    "Asus4": {"pad": [59, 62, 64, 69], "felt": [64, 69, 74, 71, 76], "root": 45},
 }
 FELT_PATTERN = [0, 2, 1, 3, 0, 2, 4, 3]
 FELT_VELOCITY = [1.0, 0.55, 0.75, 0.5, 0.9, 0.55, 0.7, 0.5]
@@ -122,6 +122,27 @@ def highpass(x: np.ndarray, cutoff: float, order: int = 2) -> np.ndarray:
 def bandpass(x: np.ndarray, lo: float, hi: float, order: int = 2) -> np.ndarray:
     sos = signal.butter(order, [lo, hi], "band", fs=SR, output="sos")
     return signal.sosfilt(sos, x, axis=0)
+
+
+def peaking(x: np.ndarray, freq: float, gain_db: float, q: float) -> np.ndarray:
+    """RBJ peaking EQ."""
+    a = 10 ** (gain_db / 40)
+    w0 = 2 * np.pi * freq / SR
+    alpha = np.sin(w0) / (2 * q)
+    b = [1 + alpha * a, -2 * np.cos(w0), 1 - alpha * a]
+    den = [1 + alpha / a, -2 * np.cos(w0), 1 - alpha / a]
+    return signal.lfilter(b, den, x, axis=0)
+
+
+def high_shelf(x: np.ndarray, freq: float, gain_db: float, slope: float = 0.8) -> np.ndarray:
+    """RBJ high shelf."""
+    a = 10 ** (gain_db / 40)
+    w0 = 2 * np.pi * freq / SR
+    alpha = np.sin(w0) / 2 * np.sqrt((a + 1 / a) * (1 / slope - 1) + 2)
+    cos = np.cos(w0)
+    b = [a * ((a + 1) + (a - 1) * cos + 2 * np.sqrt(a) * alpha), -2 * a * ((a - 1) + (a + 1) * cos), a * ((a + 1) + (a - 1) * cos - 2 * np.sqrt(a) * alpha)]
+    den = [(a + 1) - (a - 1) * cos + 2 * np.sqrt(a) * alpha, 2 * ((a - 1) - (a + 1) * cos), (a + 1) - (a - 1) * cos - 2 * np.sqrt(a) * alpha]
+    return signal.lfilter(b, den, x, axis=0)
 
 
 def pink(n: int) -> np.ndarray:
@@ -204,15 +225,16 @@ def beat_times() -> np.ndarray:
 
 
 # ─────────────────────────── instruments ───────────────────────────
-def saw_voice(freq: float, n: int, phase: float) -> np.ndarray:
-    """Band-limited saw by additive synthesis, harmonics kept under 9 kHz."""
+def soft_voice(freq: float, n: int, phase: float) -> np.ndarray:
+    """Round, clean tone: harmonics fall off as 1/k^2.2 (between a triangle and a
+    sine), so chords stay transparent instead of buzzing."""
     t = np.arange(n) / SR
     out = np.zeros(n)
     k = 1
-    while freq * k < 9000 and k <= 24:
-        out += np.sin(2 * np.pi * freq * k * t + phase * k) / k
+    while freq * k < 5000 and k <= 12:
+        out += np.sin(2 * np.pi * freq * k * t + phase * k) / k**2.2
         k += 1
-    return out * (2 / np.pi)
+    return out
 
 
 def render_pad() -> np.ndarray:
@@ -224,14 +246,16 @@ def render_pad() -> np.ndarray:
         n = idx(end - start + release)
         env = envelope(n, attack, release)
         for note in CHORDS[name]["pad"]:
-            for detune, pan in ((-0.07, -0.55), (0.0, 0.0), (0.07, 0.55)):
-                voice = saw_voice(hz(note + detune), n, RNG.uniform(0, 2 * np.pi))
-                place(bus, start, voice * env, pan=pan, gain=0.12)
+            for detune, pan in ((-0.05, -0.5), (0.05, 0.5)):
+                voice = soft_voice(hz(note + detune), n, RNG.uniform(0, 2 * np.pi))
+                place(bus, start, voice * env, pan=pan, gain=0.15)
     # Slow breathing so a held chord is never static.
     t = np.arange(N) / SR
-    bus *= (1 + 0.06 * np.sin(2 * np.pi * 0.17 * t))[:, None]
-    bright = lowpass(bus, 1900, order=4)
-    dark = lowpass(bus, 700, order=4)
+    bus *= (1 + 0.05 * np.sin(2 * np.pi * 0.17 * t))[:, None]
+    # Keep the pad out of the bass's way and out of the 300 Hz "mud" zone.
+    bus = peaking(highpass(bus, 180), 330, -6.0, 0.8)
+    bright = lowpass(bus, 3200, order=2)
+    dark = lowpass(bus, 900, order=4)
     tone = curve([(s["t"], 1.0 if s["pad"] == "dark" else 0.0) for s in sections], smooth_s=0.9)[:, None]
     return bright * (1 - tone) + dark * tone
 
@@ -241,12 +265,12 @@ def felt_note(freq: float, velocity: float) -> np.ndarray:
     n = idx(2.4)
     t = np.arange(n) / SR
     out = np.zeros(n)
-    for k, amp in ((1, 1.0), (2, 0.32), (3, 0.12), (4, 0.05), (5, 0.02)):
+    for k, amp in ((1, 1.0), (2, 0.45), (3, 0.22), (4, 0.11), (5, 0.06), (6, 0.03)):
         tau = 1.1 / (k**0.85)
         out += amp * np.sin(2 * np.pi * freq * k * (1 + 0.0003 * k * k) * t) * np.exp(-t / tau)
     hammer = lowpass(RNG.standard_normal(n), 1800) * np.exp(-t / 0.006) * 0.05
     out = (out + hammer) * raised(t / 0.006) * raised((t[-1] - t) / 0.05)
-    brightness = 1400 + 2200 * velocity
+    brightness = 3000 + 3500 * velocity
     return lowpass(out, brightness) * velocity
 
 
@@ -271,7 +295,7 @@ def render_felt() -> np.ndarray:
         else:  # sparse: one note every two beats, walking through the chord
             slot = ((beat // 2) % 4) * 2 + 1
         note = tones[FELT_PATTERN[slot] % len(tones)]
-        vel = FELT_VELOCITY[slot] * (0.8 if mode == "eighth" else 1.0)
+        vel = FELT_VELOCITY[slot] * (0.7 if mode == "eighth" else 0.9)
         vel *= RNG.uniform(0.92, 1.05)
         jitter = RNG.uniform(-0.004, 0.004)
         place(bus, t + jitter, felt_note(hz(note), vel), pan=RNG.uniform(-0.25, 0.25))
@@ -286,23 +310,23 @@ def render_bass() -> np.ndarray:
         n = idx(end - start + release)
         t = np.arange(n) / SR
         f = hz(CHORDS[name]["root"])
-        tone = np.sin(2 * np.pi * f * t) + 0.28 * np.sin(4 * np.pi * f * t) + 0.08 * np.sin(6 * np.pi * f * t)
-        tone = np.tanh(1.3 * tone) / np.tanh(1.3)
+        # Clean sine with a little 2nd/3rd harmonic so it still reads on small speakers.
+        tone = np.sin(2 * np.pi * f * t) + 0.35 * np.sin(4 * np.pi * f * t) + 0.1 * np.sin(6 * np.pi * f * t)
         s = idx(start)
         e = min(N, s + n)
         bus[s:e] += (tone * envelope(n, 0.12, release))[: e - s]
     gate = curve([(s["t"], 1.0 if s["bass"] else 0.0) for s in sections], smooth_s=1.4)
-    bus = lowpass(bus * gate, 420)
+    bus = highpass(lowpass(bus * gate, 380), 45, order=4)
     return np.stack([bus, bus], axis=1)
 
 
 def kick_sound() -> np.ndarray:
     n = idx(0.5)
     t = np.arange(n) / SR
-    freq = 46 + 58 * np.exp(-t / 0.03)
-    body = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-t / 0.17)
-    knock = lowpass(RNG.standard_normal(n), 900) * np.exp(-t / 0.006) * 0.12
-    return (body + knock) * raised(t / 0.0025)
+    freq = 56 + 64 * np.exp(-t / 0.025)
+    body = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-t / 0.11)
+    knock = lowpass(RNG.standard_normal(n), 1200) * np.exp(-t / 0.005) * 0.15
+    return highpass((body + knock) * raised(t / 0.0025), 42, order=4)
 
 
 def render_drums() -> tuple[np.ndarray, np.ndarray, np.ndarray, list[float]]:
@@ -326,7 +350,7 @@ def render_drums() -> tuple[np.ndarray, np.ndarray, np.ndarray, list[float]]:
             continue
         n = idx(0.12)
         tt = np.arange(n) / SR
-        grain = bandpass(RNG.standard_normal(n), 4800, 10500) * np.exp(-tt / 0.035) * raised(tt / 0.004)
+        grain = bandpass(RNG.standard_normal(n), 6000, 11000) * np.exp(-tt / 0.03) * raised(tt / 0.004)
         place(shaker, t + RNG.uniform(-0.003, 0.003), grain * accents[i % 4] * RNG.uniform(0.85, 1.1), pan=0.3)
     return kick, shaker, snap, kick_times
 
@@ -370,8 +394,8 @@ def whoosh(length_s: float) -> tuple[np.ndarray, np.ndarray]:
     n = idx(length_s + 0.35)
     x = np.linspace(0, 1, n)
     noise = pink(n)
-    centre = 260 * (2200 / 260) ** np.sin(np.pi * np.clip(x * 1.15, 0, 1)) ** 1.4
-    air = lowpass(svf(noise, centre, 0.9, "band") * 1.6 + lowpass(noise, 600) * 0.35, 4500)
+    centre = 220 * (1500 / 220) ** np.sin(np.pi * np.clip(x * 1.15, 0, 1)) ** 1.4
+    air = lowpass(svf(noise, centre, 0.7, "band") * 1.6 + lowpass(noise, 500) * 0.3, 2800, order=4)
     amp = shape_curve(n, 0.42)
     mono = air * amp
     return mono, np.linspace(-0.45, 0.45, n)
@@ -399,10 +423,10 @@ def hit() -> tuple[np.ndarray, float]:
     t = np.arange(n) / SR - pre
     swell = lowpass(pink(n), 1400) * raised((t + pre) / pre) * (t < 0) * 0.35
     post = np.clip(t, 0, None)
-    freq = 44 + 50 * np.exp(-post / 0.05)
-    thump = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-post / 0.32) * (t >= 0) * raised(post / 0.004)
+    freq = 58 + 52 * np.exp(-post / 0.05)
+    thump = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-post / 0.24) * (t >= 0) * raised(post / 0.004)
     tail = lowpass(pink(n), 1100) * np.exp(-post / 0.45) * (t >= 0) * 0.18 * raised(post / 0.01)
-    return swell + thump + tail, pre
+    return highpass(swell + thump + tail, 45, order=4), pre
 
 
 def riser(length_s: float) -> np.ndarray:
@@ -463,7 +487,7 @@ def render_sfx() -> np.ndarray:
 
 
 # ─────────────────────────── space + master ───────────────────────────
-def reverb_ir(rt60: float = 2.3, length_s: float = 3.2, predelay_s: float = 0.022) -> np.ndarray:
+def reverb_ir(rt60: float = 1.6, length_s: float = 2.4, predelay_s: float = 0.022) -> np.ndarray:
     n = idx(length_s)
     t = np.arange(n) / SR
     noise = RNG.standard_normal((n, 2))
@@ -472,15 +496,16 @@ def reverb_ir(rt60: float = 2.3, length_s: float = 3.2, predelay_s: float = 0.02
     damped = lowpass(noise, 2600) * decay
     mix = np.exp(-t / 0.35)[:, None]
     ir = early * mix + damped * (1 - mix)
-    ir = highpass(ir, 180)
+    ir = highpass(ir, 300)
     ir = np.concatenate([np.zeros((idx(predelay_s), 2)), ir])
     return ir / np.sqrt(np.sum(ir**2, axis=0, keepdims=True))
 
 
 def convolve_reverb(send: np.ndarray) -> np.ndarray:
     ir = reverb_ir()
+    send = highpass(send, 300)
     wet = np.stack([signal.fftconvolve(send[:, c], ir[:, c])[:N] for c in range(2)], axis=1)
-    return lowpass(wet, 7000)
+    return lowpass(wet, 8000)
 
 
 def true_peak(x: np.ndarray) -> float:
@@ -522,7 +547,10 @@ def momentary_max(x: np.ndarray) -> float:
 
 
 def calibrate(x: np.ndarray, target_lufs: float) -> np.ndarray:
-    return x * db(target_lufs - loudness(x))
+    measured = loudness(x)
+    if not math.isfinite(measured):  # layer is silent in this arrangement
+        return x
+    return x * db(target_lufs - measured)
 
 
 def loudness(x: np.ndarray) -> float:
@@ -548,9 +576,9 @@ def main() -> None:
     sfx = render_sfx()
 
     # Gentle pump from the kick keeps the bed breathing with the groove.
-    pad *= sidechain(kick_times, 0.22)
-    bass *= sidechain(kick_times, 0.35)
-    felt *= sidechain(kick_times, 0.08)
+    pad *= sidechain(kick_times, 0.15)
+    bass *= sidechain(kick_times, 0.3)
+    felt *= sidechain(kick_times, 0.05)
 
     send = (
         pad * REVERB_SEND["pad"]
@@ -563,7 +591,9 @@ def main() -> None:
     music = pad + felt + bass + kick + shaker + snap + bells + convolve_reverb(send) * db(REVERB_RETURN_DB)
     sfx = sfx + convolve_reverb(sfx * REVERB_SEND["sfx"]) * db(REVERB_RETURN_DB)
 
-    mix = highpass(music + sfx, 28)
+    mix = highpass(music + sfx, 38, order=4)
+    # Mastering tilt: a little less 300 Hz box, a little more clarity on top.
+    mix = high_shelf(peaking(mix, 300, -2.0, 0.7), 3000, 3.5)
     t = np.arange(N) / SR
     fade_in = raised(t / 0.04)
     fade_out = raised((DURATION_S - t) / SCORE["fadeOutSeconds"])
@@ -571,7 +601,9 @@ def main() -> None:
 
     lufs = loudness(mix)
     mix *= db(TARGET_LUFS - lufs)
+    before = mix.copy()
     mix = limiter(mix, db(CEILING_DBFS - 0.3))
+    limiting_db = 20 * math.log10(float(np.max(np.abs(before))) / float(np.max(np.abs(mix))) + 1e-12)
     mix *= db(TARGET_LUFS - loudness(mix))
     peak = true_peak(mix)
     if peak > db(CEILING_DBFS):
@@ -590,7 +622,7 @@ def main() -> None:
         "true_peak_dbfs": round(20 * math.log10(true_peak(mix)), 2),
         "music_lufs": round(loudness(music), 2),
         "sfx_lufs": round(loudness(sfx), 2),
-        "max_step": round(float(np.max(np.abs(np.diff(mix, axis=0)))), 4),
+        "limiter_reduction_db": round(limiting_db, 2),
     }
     print(json.dumps(stats, indent=2))
 

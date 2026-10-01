@@ -44,11 +44,10 @@ export const SCORE = {
 	/** Arrangement: which layers play from each point on. */
 	sections: [
 		{frame: 0, name: 'intro', pad: 'bright', felt: 'off', bass: false, kick: false, shaker: false, snap: false},
-		{frame: at('intro', INTRO_T.toMasthead), name: 'intro-motif', pad: 'bright', felt: 'quarter', bass: false, kick: false, shaker: false, snap: false},
+		{frame: at('intro', INTRO_T.toMasthead), name: 'intro-motif', pad: 'bright', felt: 'sparse', bass: false, kick: false, shaker: false, snap: false},
 		{frame: at('intro', INTRO_T.underlineSplit), name: 'bass-in', pad: 'bright', felt: 'quarter', bass: true, kick: false, shaker: false, snap: false},
-		{frame: SCENES.income.from, name: 'income', pad: 'bright', felt: 'quarter', bass: true, kick: false, shaker: true, snap: false},
-		{frame: at('income', INCOME_T.divider), name: 'groove', pad: 'bright', felt: 'eighth', bass: true, kick: true, shaker: true, snap: false},
-		{frame: SCENES.product.from, name: 'product', pad: 'bright', felt: 'eighth', bass: true, kick: true, shaker: true, snap: true},
+		{frame: at('income', INCOME_T.divider), name: 'pulse', pad: 'bright', felt: 'quarter', bass: true, kick: true, shaker: false, snap: false},
+		{frame: SCENES.product.from, name: 'product', pad: 'bright', felt: 'eighth', bass: true, kick: true, shaker: false, snap: false},
 		{frame: SCENES.manifesto.from, name: 'manifesto', pad: 'dark', felt: 'sparse', bass: true, kick: false, shaker: false, snap: false},
 		{frame: at('manifesto', MANIFESTO_T.wordmarkOpen), name: 'logo', pad: 'bright', felt: 'sparse', bass: true, kick: false, shaker: false, snap: false},
 	] satisfies Section[],

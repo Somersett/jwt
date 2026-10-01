@@ -97,7 +97,7 @@
         "frame": 45,
         "name": "intro-motif",
         "pad": "bright",
-        "felt": "quarter",
+        "felt": "sparse",
         "bass": false,
         "kick": false,
         "shaker": false,
@@ -114,23 +114,13 @@
         "snap": false
       },
       {
-        "frame": 165,
-        "name": "income",
+        "frame": 240,
+        "name": "pulse",
         "pad": "bright",
         "felt": "quarter",
         "bass": true,
-        "kick": false,
-        "shaker": true,
-        "snap": false
-      },
-      {
-        "frame": 240,
-        "name": "groove",
-        "pad": "bright",
-        "felt": "eighth",
-        "bass": true,
         "kick": true,
-        "shaker": true,
+        "shaker": false,
         "snap": false
       },
       {
@@ -140,8 +130,8 @@
         "felt": "eighth",
         "bass": true,
         "kick": true,
-        "shaker": true,
-        "snap": true
+        "shaker": false,
+        "snap": false
       },
       {
         "frame": 810,
@@ -172,50 +162,30 @@
   },
   "cues": [
     {
-      "frame": 0,
-      "kind": "swell",
-      "length": 40,
-      "gain": -4,
-      "note": "Air under MINETO rising"
-    },
-    {
       "frame": 45,
       "kind": "whoosh",
       "length": 22,
-      "gain": -5,
+      "gain": -9,
       "note": "Wordmark lifts into the masthead"
-    },
-    {
-      "frame": 88,
-      "kind": "click",
-      "gain": -3,
-      "note": "\"ganas\" settles into the sentence"
-    },
-    {
-      "frame": 120,
-      "kind": "hit",
-      "gain": -5,
-      "note": "Underline splits into four buckets"
     },
     {
       "frame": 169,
       "kind": "whoosh",
       "length": 22,
+      "gain": -2,
       "note": "Split underline travels to the income bar"
     },
     {
       "frame": 180,
       "kind": "tick",
+      "gain": -3,
       "repeats": [
         181,
         182,
-        183,
         184,
         185,
         187,
-        188,
         191,
-        195,
         219
       ],
       "note": "Amount counts up to $6.000.000"
@@ -223,28 +193,14 @@
     {
       "frame": 240,
       "kind": "hit",
-      "note": "Dividing line drops"
-    },
-    {
-      "frame": 246,
-      "kind": "click",
       "gain": -2,
-      "note": "Bar breaks at the line"
-    },
-    {
-      "frame": 265,
-      "kind": "tick",
-      "gain": 2,
-      "repeats": [
-        273,
-        281
-      ],
-      "note": "Categories appear (three ticks)"
+      "note": "Dividing line drops"
     },
     {
       "frame": 360,
       "kind": "whoosh",
       "length": 26,
+      "gain": -3,
       "note": "Amount lifts into tier 01"
     },
     {
@@ -253,31 +209,9 @@
       "note": "Reserve 1 lands"
     },
     {
-      "frame": 415,
-      "kind": "tick",
-      "gain": -3,
-      "repeats": [
-        417,
-        419,
-        421
-      ],
-      "note": "Available amount rolls down (1/3)"
-    },
-    {
       "frame": 441,
       "kind": "click",
       "note": "Reserve 2 lands"
-    },
-    {
-      "frame": 445,
-      "kind": "tick",
-      "gain": -3,
-      "repeats": [
-        447,
-        449,
-        451
-      ],
-      "note": "Available amount rolls down (2/3)"
     },
     {
       "frame": 471,
@@ -285,40 +219,22 @@
       "note": "Reserve 3 lands"
     },
     {
-      "frame": 475,
-      "kind": "tick",
-      "gain": -3,
-      "repeats": [
-        477,
-        479,
-        481
-      ],
-      "note": "Available amount rolls down (3/3)"
-    },
-    {
       "frame": 495,
       "kind": "hit",
+      "gain": -2,
       "note": "Available amount resolves in mint"
     },
     {
       "frame": 585,
       "kind": "whoosh",
       "length": 24,
+      "gain": -3,
       "note": "Amount flies into the interface"
-    },
-    {
-      "frame": 597,
-      "kind": "tick",
-      "repeats": [
-        601,
-        605
-      ],
-      "note": "$4.803.400 rolls into $4,8M"
     },
     {
       "frame": 675,
       "kind": "click",
-      "gain": -2,
+      "gain": -3,
       "repeats": [
         683,
         691
@@ -326,98 +242,35 @@
       "note": "Three \"Separado\" checks (every 8 frames)"
     },
     {
-      "frame": 703,
-      "kind": "click",
-      "gain": -4,
-      "note": "Payment nudge slides in"
-    },
-    {
-      "frame": 715,
-      "kind": "whoosh",
-      "length": 20,
-      "gain": -9,
-      "note": "Headline (light)"
-    },
-    {
-      "frame": 759,
-      "kind": "click",
-      "gain": -3,
-      "note": "Cursor presses the bar"
-    },
-    {
       "frame": 795,
       "kind": "whoosh",
       "length": 15,
-      "gain": 1,
       "note": "Ink wipe sweeps across"
-    },
-    {
-      "frame": 810,
-      "kind": "hit",
-      "gain": -2,
-      "note": "Ink lands: the manifesto begins"
-    },
-    {
-      "frame": 816,
-      "kind": "swell",
-      "length": 20,
-      "gain": -5,
-      "note": "Statement 1"
-    },
-    {
-      "frame": 852,
-      "kind": "swell",
-      "length": 20,
-      "gain": -5,
-      "note": "Statement 2"
-    },
-    {
-      "frame": 888,
-      "kind": "swell",
-      "length": 20,
-      "gain": -5,
-      "note": "Statement 3"
     },
     {
       "frame": 928,
       "kind": "riser",
       "length": 17,
+      "gain": -7,
       "note": "Markers line up on the slit"
     },
     {
       "frame": 945,
       "kind": "hit",
+      "gain": -3,
       "note": "Wordmark opens out of the slit"
-    },
-    {
-      "frame": 960,
-      "kind": "click",
-      "gain": -4,
-      "note": "The bar folds into the logo mark"
     },
     {
       "frame": 975,
       "kind": "whoosh",
       "length": 22,
-      "gain": -3,
-      "note": "Paper wipes up; logo recolours at the edge"
-    },
-    {
-      "frame": 999,
-      "kind": "swell",
-      "length": 24,
-      "gain": -8,
-      "note": "Tagline"
-    },
-    {
-      "frame": 1059,
-      "kind": "click",
       "gain": -4,
-      "note": "CTA hover"
+      "note": "Paper wipes up; logo recolours at the edge"
     },
     {
       "frame": 1093,
       "kind": "click",
+      "gain": -2,
       "note": "Mark closes: final click"
     }
   ]

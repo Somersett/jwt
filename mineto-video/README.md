@@ -8,7 +8,7 @@ Pieza de 37,5 s en **Remotion + React + TypeScript**, construida solo con texto,
 | Duración | 1125 frames = **37,5 s** |
 | Resolución | **1920 × 1080**, 16:9 |
 | FPS | 30 |
-| Salida | H.264, yuv420p, BT.709 · audio AAC estéreo 48 kHz, 320 kbps |
+| Salida | H.264, yuv420p, BT.709 · audio AAC estéreo 48 kHz, 320 kbps, −17 LUFS |
 
 > **Cifras demostrativas.** $6.000.000, $696.600, etc. son un *ejemplo ilustrativo*: no son un cálculo fiscal ni de seguridad social, y el video lo indica en pantalla. Se editan en `src/data/money.ts` (el disponible se recalcula solo).
 
@@ -47,9 +47,9 @@ Los tiempos internos de cada escena están en `src/motion/timeline.ts` (`INTRO_T
 
 Música y efectos se generan con `audio/synth.py` a partir de la timeline. No hay samples ni pistas externas: todo sale de ondas senoidales y ruido filtrado, con semilla fija, así que el resultado es idéntico en cada ejecución.
 
-- **Música.** Electrónica minimalista y suave a **120 BPM en Re mayor**: pad cálido filtrado, piano tipo *felt* en arpegio, bajo profundo, bombo suave, shaker muy bajo y campanas FM en las dos resoluciones (el disponible y el logo). Los acordes y la entrada de cada capa están fijados a momentos visuales en `src/audio/score.ts`. En el manifiesto la percusión se retira y el pad se oscurece; en el logo resuelve a Re mayor y el final se desvanece.
-- **Efectos.** Whoosh, click, tick, golpe suave, riser y "aire", disparados por los 35 cues de `src/audio/cues.ts`. Los ticks del conteo se espacian con la misma curva que el número, y los clicks caen justo cuando aterriza cada tarjeta o se marca cada "Separado".
-- **Mezcla y máster.** Cada capa se calibra por sonoridad medida (LUFS): los efectos quedan 3–8 LU bajo la música, audibles pero nunca encima. Máster a **−16 LUFS integrados, pico real ≤ −1 dBTP**.
+- **Música.** Electrónica minimalista y suave a **120 BPM en Re mayor**: pad de tono redondo, piano tipo *felt* en arpegio, bajo limpio, bombo suave y campanas FM en las dos resoluciones (el disponible y el logo). Pocas capas a propósito: cada una tiene su espacio en frecuencia (el pad no baja de 180 Hz, el bajo no baja de 45 Hz, la reverb no tiene graves). Los acordes y la entrada de cada capa están fijados a momentos visuales en `src/audio/score.ts`. En el manifiesto la percusión se retira y el pad se oscurece; en el logo resuelve a Re mayor y el final se desvanece.
+- **Efectos.** Pocos y suaves: 16 cues en `src/audio/cues.ts`, solo en los movimientos grandes, cuando aterriza el dinero y en los golpes estructurales. Los ticks del conteo se espacian con la misma curva que el número, y los clicks caen justo cuando aterriza cada tarjeta o se marca cada "Separado".
+- **Mezcla y máster.** Cada capa se calibra por sonoridad medida (LUFS): los efectos quedan 4–10 LU bajo la música, audibles pero nunca encima. Máster a **−17 LUFS integrados**, con margen suficiente para que el limitador nunca actúe (pico real ≈ −1,8 dBTP).
 
 ```bash
 pip install -r audio/requirements.txt   # numpy, scipy, pyloudnorm (+ matplotlib opcional)
