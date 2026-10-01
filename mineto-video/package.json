@@ -9,7 +9,8 @@
     "render": "remotion render src/index.ts MinetoPromo out/mineto-promo-1920x1080.mp4",
     "render:preview": "remotion render src/index.ts MinetoPromo out/preview-960x540.mp4 --scale=0.5 --crf=26",
     "still": "remotion still src/index.ts MinetoPromo out/poster.png --frame=1124",
-    "cues": "tsx scripts/print-cues.ts"
+    "cues": "tsx scripts/print-cues.ts",
+    "audio": "tsx scripts/export-audio-plan.ts && python3 audio/synth.py"
   },
   "dependencies": {
     "@remotion/cli": "4.0.531",

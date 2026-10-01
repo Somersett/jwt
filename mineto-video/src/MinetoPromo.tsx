@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, Sequence, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Html5Audio, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import {Hud} from './components/Hud';
 import {Wipe} from './components/SceneTransition';
 import {FontGate} from './fonts';
@@ -33,9 +33,16 @@ const ProductToManifesto: React.FC = () => {
 	return <Wipe progress={amount} from="right" color={COLORS.night} edgeColor={COLORS.mint} />;
 };
 
+/**
+ * Score + sound design, synthesised from the same timeline by `npm run audio`
+ * (see audio/synth.py). One mastered stereo track, starting at frame 0.
+ */
+const SOUNDTRACK = staticFile('audio/soundtrack.wav');
+
 export const MinetoPromo: React.FC = () => (
 	<FontGate>
 		<AbsoluteFill style={{background: COLORS.paper}}>
+			<Html5Audio src={SOUNDTRACK} />
 			{SCENE_ORDER.map((id) => {
 				const slot = SCENES[id];
 				const Scene = SCENE_COMPONENTS[id];

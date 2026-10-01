@@ -1,0 +1,5 @@
+numpy>=2.0
+scipy>=1.13
+pyloudnorm>=0.1.1
+# optional, only for `python3 audio/synth.py --report out.png`
+matplotlib>=3.8

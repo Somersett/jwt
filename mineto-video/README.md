@@ -1,6 +1,6 @@
 # MINETO — video promocional (motion graphics)
 
-Pieza de 37,5 s en **Remotion + React + TypeScript**, construida solo con texto, formas, SVG y CSS. No usa assets de pago y las fuentes están incluidas en el repositorio.
+Pieza de 37,5 s en **Remotion + React + TypeScript**, construida solo con texto, formas, SVG y CSS, con música y efectos **sintetizados por código**. No usa assets de pago ni samples, y las fuentes están incluidas en el repositorio.
 
 | | |
 |---|---|
@@ -8,7 +8,7 @@ Pieza de 37,5 s en **Remotion + React + TypeScript**, construida solo con texto,
 | Duración | 1125 frames = **37,5 s** |
 | Resolución | **1920 × 1080**, 16:9 |
 | FPS | 30 |
-| Salida | H.264, yuv420p, BT.709, CRF 16 |
+| Salida | H.264, yuv420p, BT.709 · audio AAC estéreo 48 kHz, 320 kbps |
 
 > **Cifras demostrativas.** $6.000.000, $696.600, etc. son un *ejemplo ilustrativo*: no son un cálculo fiscal ni de seguridad social, y el video lo indica en pantalla. Se editan en `src/data/money.ts` (el disponible se recalcula solo).
 
@@ -43,15 +43,22 @@ Pieza de 37,5 s en **Remotion + React + TypeScript**, construida solo con texto,
 
 Los tiempos internos de cada escena están en `src/motion/timeline.ts` (`INTRO_T`, `INCOME_T`, …). Para dar más o menos tiempo de lectura, alarga la escena en `LENGTH` y mueve su `exit` (o `wipe`) en la misma cantidad de frames.
 
-## Audio (opcional)
+## Audio
 
-El video funciona sin sonido. `src/audio/cues.ts` deriva cada cue (whoosh, click, tick, hit, riser) de las mismas tablas de tiempo que la animación, así que si mueves una animación, su cue se mueve con ella.
+Música y efectos se generan con `audio/synth.py` a partir de la timeline. No hay samples ni pistas externas: todo sale de ondas senoidales y ruido filtrado, con semilla fija, así que el resultado es idéntico en cada ejecución.
+
+- **Música.** Electrónica minimalista y suave a **120 BPM en Re mayor**: pad cálido filtrado, piano tipo *felt* en arpegio, bajo profundo, bombo suave, shaker muy bajo y campanas FM en las dos resoluciones (el disponible y el logo). Los acordes y la entrada de cada capa están fijados a momentos visuales en `src/audio/score.ts`. En el manifiesto la percusión se retira y el pad se oscurece; en el logo resuelve a Re mayor y el final se desvanece.
+- **Efectos.** Whoosh, click, tick, golpe suave, riser y "aire", disparados por los 35 cues de `src/audio/cues.ts`. Los ticks del conteo se espacian con la misma curva que el número, y los clicks caen justo cuando aterriza cada tarjeta o se marca cada "Separado".
+- **Mezcla y máster.** Cada capa se calibra por sonoridad medida (LUFS): los efectos quedan 3–8 LU bajo la música, audibles pero nunca encima. Máster a **−16 LUFS integrados, pico real ≤ −1 dBTP**.
 
 ```bash
-npm run cues   # imprime: frame · segundos · beat · tipo · descripción
+pip install -r audio/requirements.txt   # numpy, scipy, pyloudnorm (+ matplotlib opcional)
+npm run audio    # timeline → audio/plan.json → public/audio/soundtrack.wav
+npm run cues     # hoja de cues legible (frame · segundos · beat · tipo)
+python3 audio/synth.py --stems --report out/audio.png   # stems + forma de onda/espectrograma
 ```
 
-Golpes principales: f120, f240, f495, f795, f945, f975. Todos caen en beat.
+Si cambias tiempos en `src/motion/timeline.ts`, vuelve a ejecutar `npm run audio` antes de renderizar para que el sonido siga a la imagen. La pista se monta en `src/MinetoPromo.tsx` con `<Html5Audio>`.
 
 ## Estructura
 
@@ -68,7 +75,7 @@ mineto-video/
    ├─ motion/                easing (curvas, muelles, duraciones) · timeline (BPM, escenas, cues) · animate
    ├─ layout/                geometry (todas las posiciones) · measure (medición de texto)
    ├─ data/                  money (cifras demo + formato es-CO) · copy (todos los textos)
-   ├─ audio/cues.ts          hoja de cues de sonido
+   ├─ audio/                 cues.ts (efectos) · score.ts (acordes y arreglo)
    ├─ components/
    │  ├─ AnimatedMoney.tsx   conteo o rodillo por dígito (odómetro)
    │  ├─ MetricCard.tsx      bucket con cantidad, % y medidor
@@ -88,6 +95,7 @@ Requisitos: Node 18+ (probado con Node 22).
 
 ```bash
 npm install
+npm run audio            # (opcional) regenera la banda sonora; ya viene incluida
 npm run dev              # Remotion Studio para previsualizar y ajustar
 npm run render           # → out/mineto-promo-1920x1080.mp4
 npm run render:preview   # → out/preview-960x540.mp4 (rápido, media resolución)
